@@ -31,6 +31,18 @@ int main()
             cin >> v;
             L.Add(v);
             break;
+        case 3:
+            L.Sort();
+            cout << endl;
+        case 4:
+            L.Print();
+            cout << endl;
+            break;
+        default:
+            if (nr_op != 0)
+                cout << "Non existent option!";
         }
+        cout << endl;
     } while (nr_op != 0);
+    return 0;
 }
