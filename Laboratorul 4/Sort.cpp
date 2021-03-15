@@ -8,16 +8,16 @@
 
 using namespace std;
 
-Sort::Sort(int n, double min, double max)
+Sort::Sort(int n, int min, int max)
 {
 	int i;
 	if (n > 0)
 	{
-		p = (double*)malloc(n * sizeof(double));
+		p = (int*)malloc(n * sizeof(int));
 		this->n = n;
-		srand(time(NULL)); 
+		srand(time(NULL)); //initializez motorul de generare aleatorie (pe baza timpului curent)
 		for (i = 0; i < n; i++)
-			p[i] = min + rand() * ((max - min) / RAND_MAX);
+			p[i] = min + rand() % (max - min + 1);
 	}
 	else
 	{
@@ -25,13 +25,13 @@ Sort::Sort(int n, double min, double max)
 		p = NULL;
 	}
 }
-Sort::Sort(double p[], int n)
+Sort::Sort(int p[], int n)
 {
 	int i;
 	if(n>0)
 	{
-		p = (double*)malloc(n * sizeof(double));
-		this->n = n;
+		this->p = (int*)malloc(n * sizeof(int));
+		this->n= n;
 		for (i = 0; i < n; i++)
 			this->p[i] = p[i];
 	}
@@ -45,8 +45,10 @@ Sort::Sort(char*s)
 {
 	char* q, *cs;
 	int i;
+	//fac o copie a sirului s in cs
 	cs = (char*)malloc((strlen(s) + 1) * sizeof(char));
 	strcpy(cs, s);
+	//parcurg sirul pentru a determina numarul de valori
 	n = 0;
 	q = strtok(cs, ",");
 	while (q != NULL)
@@ -54,30 +56,51 @@ Sort::Sort(char*s)
 		n++;
 		q = strtok(NULL, ",");
 	}
-	p = (double*)malloc(n * sizeof(double));
+	//aloc memorie pentru n valori 
+	p = (int*)malloc(n * sizeof(int));
+	//parcurg din nou sirul pentru a determina si copia valorile
 	strcpy(cs, s);
 	q = strtok(cs, ",");
 	i = 0;
 	while (q != NULL)
 	{
-		p[i] = atof(q);
+		p[i] = atoi(q);
 		i++;
+		q = strtok(NULL, ",");
+	}
+	free(cs);
+}
+Sort::Sort(int n, ...)
+{
+	va_list l;
+	int i;
+	if (n > 0)
+	{
+		this->n = n;
+		p = (int*)malloc(n * sizeof(int));
+		va_start(l, n);
+		for (i = 0; i < n; i++)
+			p[i] = va_arg(l, int);
+		va_end(l);
+	}
+	else
+	{
+		this->n = 0;
+		p = NULL;
 	}
 }
-/*Sort::Sort(int count, ...) 
+Sort::Sort() 
 {
-	va_list args;
+	n = 10;
 	int i;
-	double *q;
-	va_start(args, count);
-	for (i = 1; i <= count; i++)
-	    q[i] = va_arg(args, int);
-	va_end(args);
-}*/
+	p = (int*)malloc(n * sizeof(int));
+	for (i = 0; i < n; i++)
+		p[i] = i;
+}
 void Sort::InsertSort(bool ascendent)
 {
 	int i,j,k;
-	double aux;
+	int aux;
 	if (ascendent)
 	{
 		for (i = 1; i < n; i++)
@@ -115,58 +138,69 @@ void Sort::QuickSort(bool ascendent)
 void Sort::QuickSort_R_A(int st, int dr)
 {
 	int i, j;
-	double aux;
-	i = st + 1;
-	j = dr;
-	while (i <= j)
+	int aux;
+	if (st < dr)
 	{
-		if (p[i] <= p[st]) i++;
-		if (p[j] >= p[st]) j--;
-		if (p[i] > p[st] && p[j] < p[st] && i < j)
+		i = st + 1;
+		j = dr;
+		while (i <= j)
 		{
-			aux = p[i];
-			p[i] = p[j];
-			p[j] = aux;
-			i++;
-			j--;
+			if (p[i] <= p[st]) i++;
+			if (p[j] >= p[st]) j--;
+			if (p[i] > p[st] && p[j] < p[st] && i < j)
+			{
+				aux = p[i];
+				p[i] = p[j];
+				p[j] = aux;
+				i++;
+				j--;
+			}
 		}
+		aux = p[st];
+		p[st] = p[j];
+		p[j] = aux;
+		QuickSort_R_A(st, j - 1);
+		QuickSort_R_A(j + 1, dr);
 	}
-	aux = p[st];
-	p[st] = p[j];
-	p[j] = aux;
-	QuickSort_R_A(st, j - 1);
-	QuickSort_R_A(j + 1, dr);
 }
 void Sort::QuickSort_R_D(int st, int dr)
 {
 	int i, j;
-	double aux;
-	i = st + 1;
-	j = dr;
-	while (i <= j)
+	int aux;
+	if (st < dr)
 	{
-		if (p[i] >= p[st]) i++;
-		if (p[j] <= p[st]) j--;
-		if (p[i] < p[st] && p[j] > p[st] && i < j)
+		i = st + 1;
+		j = dr;
+		while (i <= j)
 		{
-			aux = p[i];
-			p[i] = p[j];
-			p[j] = aux;
-			i++;
-			j--;
+			if (p[i] >= p[st]) i++;
+			if (p[j] <= p[st]) j--;
+			if (p[i] < p[st] && p[j] > p[st] && i < j)
+			{
+				aux = p[i];
+				p[i] = p[j];
+				p[j] = aux;
+				i++;
+				j--;
+			}
 		}
+		aux = p[st];
+		p[st] = p[j];
+		p[j] = aux;
+		QuickSort_R_D(st, j - 1);
+		QuickSort_R_D(j + 1, dr);
 	}
-	aux = p[st];
-	p[st] = p[j];
-	p[j] = aux;
-	QuickSort_R_A(st, j - 1);
-	QuickSort_R_A(j + 1, dr);
+}
+Sort::~Sort()
+{
+	if (p != NULL)
+		free(p);
 }
 void Sort::BubbleSort(bool ascendent)
 {
 	int i;
 	bool ordonat;
-	double aux;
+	int aux;
 	if (ascendent)
 	{
 		do

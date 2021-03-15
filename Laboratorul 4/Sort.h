@@ -2,13 +2,16 @@
 
 class Sort
 {
-    double *p;
+    int *p;
     int n;
 
 public:
-    Sort(int, double, double);
-    Sort(double[], int);
+    Sort(int, int, int);
+    Sort(int[], int);
     Sort(char*);
+    Sort(int,...);
+    Sort();
+    ~Sort();
     void InsertSort(bool ascendent = false);
     void QuickSort(bool ascendent = false);
     void BubbleSort(bool ascendent = false);
