@@ -51,7 +51,10 @@ void create_word_map(string text, map<string,int> &word_map)
 				}
 				else
 					is_separator = true;
-			word_map[word]++;
+			if (word_map.find(word) != word_map.end())
+				word_map[word]++;
+			else
+				word_map[word] = 1;
 		}
 	/*
 	for(map<string, int>::const_iterator i = word_map.begin(); i != word_map.end(); i++)
